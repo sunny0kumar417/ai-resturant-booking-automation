@@ -1,0 +1,318 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "Resturant name - Spice Garden Restaurant\n\nWhen a customer sends any message like:\n\n* Hi\n* Hello\n* Book table\n* Reservation\n* Reserve a table\n\nThe bot should reply:\n\n> 👋 Welcome to Spice Garden!\n>\n> Please provide:\n>\n> 1. Your Name\n> 2. Date of Visit\n> 3. Time\n> 4. Number of Guests\n\n---\n\nAfter the customer replies, the bot should:\n\n* Extract the information\n* Check whether all four details are present.\n\n---\n\n### Case 1: Missing information\n\nIf something is missing, reply only asking for the missing information.\n\nExample:\n\nCustomer:\n\n> Rahul, tomorrow, 7 PM\n\nBot:\n\n> Thank you Rahul.\n>\n> I still need:\n> • Number of Guests\n\n---\n\n### Case 2: Everything provided\n\nIf all details are present:\n\nStore them in Google Sheets.\n\nColumns:\n\n* Timestamp\n* Customer Name\n* Date\n* Time\n* Guests\n* WhatsApp Number\n\nThen reply:\n\n> ✅ Your reservation request has been received.\n>\n> We will confirm shortly.\n\n---\n\n## Bonus Requirements\n\nIf the customer says:\n\n* Cancel booking\n\nFind their latest booking in Google Sheets and update Status = Cancelled.\n\nReply:\n\n> Your reservation has been cancelled.\n\n---\n\nIf customer asks:\n\n> What are your timings?\n\nReply:\n\n> We're open every day from 11 AM to 11 PM.\n\n---\n\nIf customer sends anything unrelated like:\n\n> Do you sell pizza?\n\nReply:\n\n> Sorry, I can only help with reservations.\n\n\nas soon as the order is approved in google sheet \nreply \n\nyour booking is confirmed successfully\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        576,
+        -80
+      ],
+      "id": "76e2cbcc-2bfb-4a5c-bb78-59dc3862f068",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        128
+      ],
+      "id": "47a4a5be-bbd2-4796-844c-d581eee536d5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "rnqVrX3m2TR6KYsB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ",
+          "mode": "list",
+          "cachedResultName": "menu ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        128
+      ],
+      "id": "fb6a5cbb-6a04-479d-9338-8093d66fd127",
+      "name": "menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i5ilYm3wlIu40jlI",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ",
+          "mode": "list",
+          "cachedResultName": "menu ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2044768184,
+          "mode": "list",
+          "cachedResultName": "faqs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit#gid=2044768184"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        128
+      ],
+      "id": "15eee5ee-0d61-41ac-b0da-f70bbf7a3a73",
+      "name": "faqs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i5ilYm3wlIu40jlI",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        -96
+      ],
+      "id": "2917cce1-fafd-49af-a4e1-8a21c194f82b",
+      "name": "When chat message received",
+      "webhookId": "0bd0ea09-d655-4322-a132-ffca4a45013d"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        624,
+        128
+      ],
+      "id": "c3a09a86-f19b-4a94-b097-345cded011d2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ",
+          "mode": "list",
+          "cachedResultName": "menu ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1163745596,
+          "mode": "list",
+          "cachedResultName": "Customer datails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FYrSwwYD6vfw3wYm45IRTZoab5P5JJEX-P8FEvS4xkQ/edit#gid=1163745596"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "guests": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('guests', ``, 'string') }}",
+            "time": "={{ $today.toFormat(\"yyyy-MM-dd\") }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "guests",
+              "displayName": "guests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        112
+      ],
+      "id": "78e667b6-c019-4421-b551-11dff4eb37f5",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i5ilYm3wlIu40jlI",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "menu": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "faqs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "95a34b24-5fe9-462a-a544-8907d4af38a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79243451d8fecd41dae7ae192da02ea18034dd0f89bc686511c1d1bdceccacd3"
+  },
+  "nodeGroups": [],
+  "id": "kNjXMAwTTHSbs8HD",
+  "tags": []
+}
